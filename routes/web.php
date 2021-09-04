@@ -14,8 +14,9 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
-Route::get('/{any}', function () {
-    return view('index');
-})->where('any','.*');
+// Route::get('/{any}', function () {
+//     return view('index');
+// })->where('any','.*');
 
+Route::view("/{app?}", 'index')->where('app', '.*');
 

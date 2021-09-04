@@ -1,11 +1,13 @@
-require('./bootstrap');
-
-import Vue from 'vue'
+import Vue from 'vue';
 import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 
-window.Vue = require('vue').default;
+require('./bootstrap');
+
+// window.Vue = require('vue').default;
+
+import {store} from './components/store'
 
 import App from './components/App'
 import Home from './components/Home'
@@ -16,6 +18,8 @@ import ShowProject from './components/ShowProject'
 import ShowUser from './components/ShowUser'
 import ProjectView from './components/ProjectView'
 import NewProject from './components/NewProject'
+import Dashboard from './components/Dashboard'
+
 import axios from 'axios';
 
 
@@ -28,25 +32,18 @@ const router = new VueRouter({
             path: '/',
             name: 'home',
             component: Home,
-            beforeEnter: (to, form, next) =>{
-                axios.get('/api/auth').then(()=>{
-                    next()
-                }).catch(()=>{
-                    return next({name: 'login'})
-                })
-            }
         },
         {
             path: '/userslist',
             name: 'userslist',
             component: UsersList,
-            beforeEnter: (to, form, next) =>{
-                axios.get('/api/auth').then(()=>{
-                    next()
-                }).catch(()=>{
-                    return next({name: 'login'})
-                })
-            }
+            // beforeEnter: (to, form, next) =>{
+            //     axios.get('/api/auth').then(()=>{
+            //         next()
+            //     }).catch(()=>{
+            //         return next({name: 'login'})
+            //     })
+            // }
         },
         {
             path: '/project/:projectId',
@@ -81,6 +78,11 @@ const router = new VueRouter({
             name: 'newProject',
             component: NewProject
         },
+        {
+            path: '/dashboard',
+            name: 'dashboard',
+            component: Dashboard,
+        },
 
     ]
 })
@@ -88,6 +90,8 @@ const router = new VueRouter({
 
 const app = new Vue({
     el: '#app',
-    components: {App},
-    router
+    render : app => app(App),
+    //components: {App},
+    router,
+    store
 });

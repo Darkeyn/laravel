@@ -7,7 +7,7 @@
                 <h4>Имя : </h4>
             </div>
             <div class="col col-lg-4">
-                <input type="text" v-model="user.name" class="form-control">
+                <input type="text" v-model="oneuser.name" class="form-control">
             </div>
             <div class="col col-lg-4">
             </div>
@@ -18,7 +18,7 @@
                 <h4>Email : </h4>
             </div>
             <div class="col col-lg-4">
-                <input type="text" @blur="saveEmail" v-model="user.email" class="form-control">
+                <input type="text" @blur="saveEmail" v-model="oneuser.email" class="form-control">
             </div>
             <div class="col col-lg-4">
             </div>
@@ -29,7 +29,7 @@
                 <h4>Роль : </h4>
             </div>
             <div class="col col-lg-4">
-                <input type="text" @blur="saveRole" v-model="user.role" class="form-control">
+                <input type="text" @blur="saveRole" v-model="oneuser.role" class="form-control">
             </div>
             <div class="col col-lg-4">
             </div>
@@ -49,7 +49,7 @@
             </div>
         </div>
 
-        <div class="row justify-content-md-center" v-for="project in user.projects" :key="project.id">
+        <div class="row justify-content-md-center" v-for="project in oneuser.projects" :key="project.id">
             <div class="col col-lg-2">
                 <h4>{{project.id}}</h4>
             </div>
@@ -82,7 +82,7 @@ export default {
     ],
     data() {
         return{
-            user: [],
+            oneuser: [],
             loading: true
         }
     },
@@ -118,7 +118,7 @@ export default {
     mounted(){
         axios.get('/api/users/' + this.userId)
         .then (response => {[
-            this.user = response.data.data
+            this.oneuser = response.data.data
         ]})
         .finally(()=>{
             this.loading = false

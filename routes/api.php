@@ -20,20 +20,33 @@ use App\Http\Controllers\LoginController;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
-Route::middleware('auth:sanctum')->get('/auth', function () {
-    return true;
-});
+// Route::middleware('auth:sanctum')->get('/auth', function () {
+//     return true;
+// });
 
 Route::post('register', [RegisterController::class,'register']);
-Route::post('login', [LoginController::class,'login']);
-Route::post('logout', [LoginController::class,'logout']);
 
 Route::apiResources([
     'users' => UserController::class,
     'projects' => ProjectController::class,
     'projectsinfo' => ProjectUserController::class,
 ]);
+
+Route::group([
+
+    'middleware' => 'api'
+
+], function ($router) {
+
+    Route::post('login', [LoginController::class,'login']);
+    Route::post('logout', [LoginController::class,'logout']);
+    //Route::post('refresh', [AuthController::class,'refresh']);
+    Route::post('user', [LoginController::class,'user']);
+    Route::post('checkToken', [LoginController::class,'checkToken']);
+    //Route::post('admin', [AdminController::class,'index']);
+
+});
