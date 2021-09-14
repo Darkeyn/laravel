@@ -19,6 +19,7 @@ import ShowUser from './components/ShowUser'
 import ProjectView from './components/ProjectView'
 import NewProject from './components/NewProject'
 import Dashboard from './components/Dashboard'
+import UserKab from './components/UserKab'
 
 import axios from 'axios';
 
@@ -82,6 +83,11 @@ const router = new VueRouter({
             path: '/dashboard',
             name: 'dashboard',
             component: Dashboard,
+        },
+        {
+            path: '/userkab',
+            name: 'userkab',
+            component: UserKab,
         },
 
     ]

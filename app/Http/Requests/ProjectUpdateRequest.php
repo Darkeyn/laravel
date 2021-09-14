@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProjectStoreRequest extends FormRequest
+class ProjectUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,7 @@ class ProjectStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|max:255|min:2|unique:projects,name,',
+            'name' => 'required|max:255|min:2|unique:projects,name,'.$this->project->id,
             'adress' => 'required|max:255|min:2',
             'ssh' => 'max:255',
             'admin_login' => 'max:255',

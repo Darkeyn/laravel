@@ -24,8 +24,8 @@ class UserStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|max:255|min:2|unique:users,name'.$this->user->id,
-            'email' => 'required|email|max:255|min:2|unique:users,email'.$this->user->id,
+            'name' => 'required|max:255|min:2|unique:users,name,'.$this->user->id,
+            'email' => 'required|email|max:255|min:2|unique:users,email,'.$this->user->id,
             'role' => 'max:255|min:2',
             'password' => 'required|max:255|min:2',
         ];

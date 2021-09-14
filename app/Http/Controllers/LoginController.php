@@ -28,11 +28,11 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
-        $credentials = $request->only('email','password');
-        // $credentials = $request->validate([
-        //     'email' => 'required|email',
-        //     'password' => 'required|min:6',
-        // ]);
+        // $credentials = $request->only('email','password');
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:6',
+        ]);
         if(!$token = JWTAuth::attempt($credentials)) {
             return response()->json(['success'=>false], 401);
         }

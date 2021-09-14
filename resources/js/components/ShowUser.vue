@@ -1,35 +1,57 @@
 <template>
 
-    <div class="container"> 
+    <div class="container mt-4"> 
         
-        <div class="row justify-content-md-center">
+        <div class="row justify-content-md-center mt-1">
+            <div class="col col-lg-4">
+                <h4>Id : </h4>
+            </div>
+            <div class="col col-lg-4">
+                <h4>{{oneuser.id}}</h4>
+            </div>
+            <div class="col col-lg-4">
+            </div>
+        </div>
+        
+        <div class="row justify-content-md-center mt-1">
             <div class="col col-lg-4">
                 <h4>Имя : </h4>
             </div>
             <div class="col col-lg-4">
-                <input type="text" v-model="oneuser.name" class="form-control">
+                <input type="text" @blur="saveUser" v-model="oneuser.name" class="form-control">
             </div>
             <div class="col col-lg-4">
             </div>
         </div>
 
-        <div class="row justify-content-md-center">
+        <div class="row justify-content-md-center mt-1">
             <div class="col col-lg-4">
                 <h4>Email : </h4>
             </div>
             <div class="col col-lg-4">
-                <input type="text" @blur="saveEmail" v-model="oneuser.email" class="form-control">
+                <input type="text" @blur="saveUser" v-model="oneuser.email" class="form-control">
             </div>
             <div class="col col-lg-4">
             </div>
         </div>
 
-        <div class="row justify-content-md-center mb-4">
+        <!-- <div class="row justify-content-md-center mt-1">
+            <div class="col col-lg-4">
+                <h4>Пароль : </h4>
+            </div>
+            <div class="col col-lg-4">
+                <input type="text" @blur="saveUser" v-model="oneuser.password" class="form-control">
+            </div>
+            <div class="col col-lg-4">
+            </div>
+        </div> -->
+
+        <div class="row justify-content-md-center mt-1 mb-4">
             <div class="col col-lg-4">
                 <h4>Роль : </h4>
             </div>
             <div class="col col-lg-4">
-                <input type="text" @blur="saveRole" v-model="oneuser.role" class="form-control">
+                <input type="text" @blur="saveUser" v-model="oneuser.role" class="form-control">
             </div>
             <div class="col col-lg-4">
             </div>
@@ -37,19 +59,19 @@
 
         <h1>Проекты пользователя:</h1>
 
-        <div class="row justify-content-md-center mb-3">
-            <div class="col col-lg-2">
+        <div class="row justify-content-md-centermb-3">
+            <div class="col col-lg-2 mt-2 mb-2">
                 <h4>Id проекта</h4>
             </div>
-            <div class="col col-lg-7">
+            <div class="col col-lg-7 mt-2 mb-2">
                 <h4>Название</h4>
             </div>
-            <div class="col col-lg-3">
+            <div class="col col-lg-3 mt-2 mb-2">
                 <h4>Права пользователя</h4>
             </div>
         </div>
 
-        <div class="row justify-content-md-center" v-for="project in oneuser.projects" :key="project.id">
+        <div class="row justify-content-md-center mb-1" v-for="project in oneuser.projects" :key="project.id">
             <div class="col col-lg-2">
                 <h4>{{project.id}}</h4>
             </div>
@@ -87,42 +109,41 @@ export default {
         }
     },
     methods:{
-        saveName(){
+        saveUser(){
         axios.post('/api/users/' + this.userId, {
             _method: 'PUT',
-            name: this.name,
+            name: this.oneuser.name,
+            email: this.oneuser.email,
+            role: this.oneuser.role,
+            password: this.oneuser.password,
         })
         .finally(()=>{
             this.loading = false
         })
         },
-        saveEmail(){
-        axios.post('/api/users/' + this.userId, {
-            _method: 'PUT',
-            email: this.email,
-        })
-        .finally(()=>{
-            this.loading = false
-        })
-        },
-        saveRole(){
-        axios.post('/api/users/' + this.userId, {
-            _method: 'PUT',
-            role: this.role,
-        })
-        .finally(()=>{
-            this.loading = false
-        })
+        thisUserData(){
+            axios.get('/api/users/' + this.userId)
+            .then (response => {[
+                this.oneuser = response.data.data
+            ]})
         },
     },
     mounted(){
-        axios.get('/api/users/' + this.userId)
-        .then (response => {[
-            this.oneuser = response.data.data
-        ]})
-        .finally(()=>{
-            this.loading = false
-        })
+        if (this.$store.state.token !== '') {
+            axios.post('/api/checkToken', {token : this.$store.state.token})
+            .then(res => {
+                this.thisUserData();
+                this.loading = false;
+            })
+            .catch(err => {
+                this.loading = false;
+                this.$store.commit('clearToken');
+                this.$router.push('/login');
+            })
+        }else {
+            this.loading = false;
+            this.$router.push('/login');
+        }
     },
 }
 </script>

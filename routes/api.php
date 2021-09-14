@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AccessController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\ProjectUserController;
 use App\Http\Controllers\Api\UserController;
@@ -36,12 +37,14 @@ Route::apiResources([
     'projectsinfo' => ProjectUserController::class,
 ]);
 
+
 Route::group([
 
     'middleware' => 'api'
 
 ], function ($router) {
-
+    
+    Route::post('access/{project_id}/{user_id}', [AccessController::class,'info']);
     Route::post('login', [LoginController::class,'login']);
     Route::post('logout', [LoginController::class,'logout']);
     //Route::post('refresh', [AuthController::class,'refresh']);

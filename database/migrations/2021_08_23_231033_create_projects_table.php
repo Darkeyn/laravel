@@ -17,7 +17,7 @@ class CreateProjectsTable extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->string('adress');
-            $table->string('ssh');
+            $table->string('ssh')->nullable();
             $table->string('admin_login')->nullable();
             $table->string('admin_password')->nullable();
             $table->timestamps();

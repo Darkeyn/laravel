@@ -12,6 +12,9 @@
                             <li>
                                 <router-link :to="{name: 'userslist'}" class="nav-link px-2 text-white"> Список пользователей </router-link>
                             </li>
+                            <li  v-if="loged">
+                                <router-link :to="{name: 'userkab'}" class="nav-link px-2 text-white"> Личный кабинет </router-link>
+                            </li>
                         </ul>
                         <!-- <h4>{{this.$store.state.token}}</h4> -->
                     

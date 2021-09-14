@@ -20,7 +20,7 @@
             </div>
         </div>
 
-        <div class="row justify-content-md-center" v-for="project in projects" :key="project.id">
+        <div class="row justify-content-md-center mb-1" v-for="project in projects" :key="project.id">
             <div class="col col-lg-2">
                 <h4>{{project.id}}</h4>
             </div>
@@ -30,37 +30,40 @@
                 </router-link>
             </div>
 
-            <div class="col col-lg-2" v-if="userinfo.role === 'Admin'">
-                <router-link :to="{name: 'ProjectView', params: {projectId: project.id}}" class="">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-                </svg>
-                </router-link>
-            </div>
-            <div class="col col-lg-2" v-else>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-                </svg>
-            </div>
+                <div class="col col-lg-2" v-if="userinfo.role === 'Admin'">
+                    <router-link :to="{name: 'ProjectView', params: {projectId: project.id}}" class="">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                    </svg>
+                    </router-link>
+                </div>
+                <div class="col col-lg-2" v-else>
+                    <!-- <div v-if="Access(project.id, userinfo.id)"> -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                    </svg>
+                    <!-- <h4>{{ access.permission }}</h4>
+                    </div> -->
+                </div>
 
-            <div class="col col-lg-2" v-if="userinfo.role === 'Admin'">
-                <!-- <svg xmlns="http://www.w3.org/2000/svg" @click="deleteProject(project.id)" width="16" height="16" fill="currentColor" class="bi bi-bucket" viewBox="0 0 16 16">
-                    <path d="M2.522 5H2a.5.5 0 0 0-.494.574l1.372 9.149A1.5 1.5 0 0 0 4.36 16h7.278a1.5 1.5 0 0 0 1.483-1.277l1.373-9.149A.5.5 0 0 0 14 5h-.522A5.5 5.5 0 0 0 2.522 5zm1.005 0a4.5 4.5 0 0 1 8.945 0H3.527zm9.892 1-1.286 8.574a.5.5 0 0 1-.494.426H4.36a.5.5 0 0 1-.494-.426L2.58 6h10.838z"/>
-                </svg> -->
-                
-                <button type="button" class="btn btn-danger py-2" @click="deleteProject(project.id)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bucket" viewBox="0 0 16 16">
-                    <path d="M2.522 5H2a.5.5 0 0 0-.494.574l1.372 9.149A1.5 1.5 0 0 0 4.36 16h7.278a1.5 1.5 0 0 0 1.483-1.277l1.373-9.149A.5.5 0 0 0 14 5h-.522A5.5 5.5 0 0 0 2.522 5zm1.005 0a4.5 4.5 0 0 1 8.945 0H3.527zm9.892 1-1.286 8.574a.5.5 0 0 1-.494.426H4.36a.5.5 0 0 1-.494-.426L2.58 6h10.838z"/>
-                </svg>
-                </button>
-            </div>
-            <div class="col col-lg-2" v-else>
-                <button type="button" class="btn btn-danger py-2" @click="deleteProject(project.id)" disabled>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bucket" viewBox="0 0 16 16">
-                    <path d="M2.522 5H2a.5.5 0 0 0-.494.574l1.372 9.149A1.5 1.5 0 0 0 4.36 16h7.278a1.5 1.5 0 0 0 1.483-1.277l1.373-9.149A.5.5 0 0 0 14 5h-.522A5.5 5.5 0 0 0 2.522 5zm1.005 0a4.5 4.5 0 0 1 8.945 0H3.527zm9.892 1-1.286 8.574a.5.5 0 0 1-.494.426H4.36a.5.5 0 0 1-.494-.426L2.58 6h10.838z"/>
-                </svg>
-                </button>
-            </div>
+                <div class="col col-lg-2" v-if="userinfo.role === 'Admin'">
+                    <!-- <svg xmlns="http://www.w3.org/2000/svg" @click="deleteProject(project.id)" width="16" height="16" fill="currentColor" class="bi bi-bucket" viewBox="0 0 16 16">
+                        <path d="M2.522 5H2a.5.5 0 0 0-.494.574l1.372 9.149A1.5 1.5 0 0 0 4.36 16h7.278a1.5 1.5 0 0 0 1.483-1.277l1.373-9.149A.5.5 0 0 0 14 5h-.522A5.5 5.5 0 0 0 2.522 5zm1.005 0a4.5 4.5 0 0 1 8.945 0H3.527zm9.892 1-1.286 8.574a.5.5 0 0 1-.494.426H4.36a.5.5 0 0 1-.494-.426L2.58 6h10.838z"/>
+                    </svg> -->
+                    
+                    <button type="button" class="btn btn-danger" @click="deleteProject(project.id)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bucket" viewBox="0 0 16 16">
+                        <path d="M2.522 5H2a.5.5 0 0 0-.494.574l1.372 9.149A1.5 1.5 0 0 0 4.36 16h7.278a1.5 1.5 0 0 0 1.483-1.277l1.373-9.149A.5.5 0 0 0 14 5h-.522A5.5 5.5 0 0 0 2.522 5zm1.005 0a4.5 4.5 0 0 1 8.945 0H3.527zm9.892 1-1.286 8.574a.5.5 0 0 1-.494.426H4.36a.5.5 0 0 1-.494-.426L2.58 6h10.838z"/>
+                    </svg>
+                    </button>
+                </div>
+                <div class="col col-lg-2" v-else>
+                    <button type="button" class="btn btn-danger" @click="deleteProject(project.id)" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bucket" viewBox="0 0 16 16">
+                        <path d="M2.522 5H2a.5.5 0 0 0-.494.574l1.372 9.149A1.5 1.5 0 0 0 4.36 16h7.278a1.5 1.5 0 0 0 1.483-1.277l1.373-9.149A.5.5 0 0 0 14 5h-.522A5.5 5.5 0 0 0 2.522 5zm1.005 0a4.5 4.5 0 0 1 8.945 0H3.527zm9.892 1-1.286 8.574a.5.5 0 0 1-.494.426H4.36a.5.5 0 0 1-.494-.426L2.58 6h10.838z"/>
+                    </svg>
+                    </button>
+                </div>
             <!-- <div class="col col-lg-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bucket-fill" viewBox="0 0 16 16">
                     <path d="M2.522 5H2a.5.5 0 0 0-.494.574l1.372 9.149A1.5 1.5 0 0 0 4.36 16h7.278a1.5 1.5 0 0 0 1.483-1.277l1.373-9.149A.5.5 0 0 0 14 5h-.522A5.5 5.5 0 0 0 2.522 5zm1.005 0a4.5 4.5 0 0 1 8.945 0H3.527z"/>
@@ -72,6 +75,14 @@
                 <span class="visually-hidden">Загрузка...</span>
             </div>
         </div>
+
+        <!-- <div class="container">
+            <button type="button" class="btn btn-info btn-lg btn-block mb-3" @click="userAcces(projectsinfo)">Добавить проект</button>
+        </div> -->
+
+        <!-- <div class="container" v-for="everyProject in projectsinfo">
+            <h4>{{ everyProject.user_id }}</h4>
+        </div> -->
     </div>
 </template>
 
@@ -79,9 +90,13 @@
 export default {
     data() {
         return{
+            access: [],
             projects: [],
             userinfo: [],
-            loading: true
+            // projectsinfo: [],
+            loading: true,
+            admin: false,
+            redactor: false
         }
     },
     mounted(){
@@ -103,14 +118,14 @@ export default {
         }
     },
     methods:{
-        pencilFunc: function () {
-                for (projectinfo in projectsinfo){
-                    if (project.id == projectinfo.project_id && user.id == projectinfo.user_id && projectinfo.permission == 2)
-                    return false
-                    else
-                    return true
-                }
-        },
+        // pencilFunc: function () {
+        //         for (projectinfo in projectsinfo){
+        //             if (project.id == projectinfo.project_id && user.id == projectinfo.user_id && projectinfo.permission == 2)
+        //                 return false
+        //             else
+        //                 return true
+        //         }
+        // },
         deleteProject(id){
             if(confirm('Удалить проет?')){
                 axios.post('/api/projects/'+id,{
@@ -126,7 +141,6 @@ export default {
             }
         },
         getAllProjects(){
-            
             axios.get('/api/projects')
             .then (response => {
                 this.projects = response.data.data
@@ -135,9 +149,9 @@ export default {
                 this.loading = false
             })
             
-            axios.get('/api/projectsinfo').then((res)=>{
-                this.projectsinfo = res.data.data
-            })
+            // axios.get('/api/projectsinfo').then((res)=>{
+            //     this.projectsinfo = res.data.data
+            // })
             },
 
         goproject(){
@@ -148,16 +162,22 @@ export default {
             .then (res => {
                 this.userinfo = res.data
             })
-        }
-    //   userAcces(users, id){
-    //       proverka = false;
-    //       for(user in users){
-    //           if(user.pivot.user_id === id){
-    //               proverka = true
-    //           }
-    //       }
-    //       return proverka
-    //   }
+        },
+        Access(project_id, userinfo_id){
+            console.log("1"),
+            axios.post('/api/access/'+project_id+'/'+userinfo_id, {token : this.$store.state.token})
+            .then (response => {
+                this.access = response.data.data
+            })
+        },
+        // userAcces(projectsinfo){
+        //     this.admin = false, 
+        //     this.redactor = false
+        //         console.log(this.projectsinfo)
+        //     for(this.everyProject in projectsinfo){
+        //         console.log(this.everyProject.id)
+        //     }
+        // }
     }
 }
 </script>
