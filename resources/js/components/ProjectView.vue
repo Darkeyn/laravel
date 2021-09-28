@@ -2,7 +2,8 @@
 
     <div class="container mt-4"> 
         <!-- <input type="text" v-model="project.name" class="form-control"> -->
-        
+        <div class="row justify-content-md-center mt-1">
+        <div class="col col-lg-10">
         <div class="row justify-content-md-center mt-1">
             <div class="col col-lg-4">
                 <h4>Id проекта: </h4>
@@ -49,12 +50,52 @@
 
         <div class="row justify-content-md-center mt-1">
             <div class="col col-lg-4">
-                <h4>Пароль администратора:: </h4>
+                <h4>Пароль администратора: </h4>
             </div>
             <div class="col col-lg-4">
                 <input type="text" @blur="saveData" v-model="project.admin_password" class="form-control">
             </div>
             <div class="col col-lg-4">
+            </div>
+        </div>
+        </div>
+            <div class="col col-lg-2" v-if="project.ssh === null">
+                <form @submit.prevent="submit">
+                    <input type="file" class="mb-3" @change="onChangeSsh">
+                    <button type="submit" class="btn btn-danger">Загрузить ssh</button>
+                </form>
+            </div>
+        </div>
+
+
+        <h1>Пользователи проекта:</h1>
+
+        <div class="row justify-content-md-center mb-1">
+            <div class="col col-lg-2 mt-2 text-center">
+                <h4>Id</h4>
+            </div>
+            <div class="col col-lg-6 mt-2">
+                <h4>Имя</h4>
+            </div>
+            <div class="col col-lg-4 mt-2 text-center">
+                <h4>Права</h4>
+            </div>
+        </div>
+
+        <div class="row justify-content-md-center" v-for="user in project.users" :key="user.id">
+            <div class="col col-lg-2 border border-right-0 border-dark text-center pt-2">
+                <h4>{{user.id}}</h4>
+            </div>
+            <div class="col col-lg-6 border border-right-0 border-dark pt-2">
+                <router-link :to="{name: 'showUser', params: {userId: user.id}}" class="">
+                    <h4>{{user.name}}</h4>
+                </router-link>
+            </div>
+            <div class="col col-lg-4 border border-dark text-center pt-2" v-if="user.pivot.permission === 1">
+                    <h4>Редактирование</h4>
+            </div>
+            <div class="col col-lg-4 border border-dark text-center pt-2" v-if="user.pivot.permission === 2">
+                    <h4>Администрирование</h4>
             </div>
         </div>
 
@@ -75,7 +116,10 @@ export default {
     data() {
         return{
             project: [],
-            loading: true
+            loading: true,
+            form:{
+                ssh: null,
+            }
         }
     },
     methods:{
@@ -96,6 +140,16 @@ export default {
             .then (response => {
                 this.project = response.data.data
             })
+        },
+        onChangeSsh(e){
+            console.log("selected file", e.target.files[0])
+            this.form.ssh = e.target.files[0];
+        },
+        submit(){
+            let fd = new FormData();
+            axios.post('/api/fileadd/', fd).then(res=>{
+                console.log("Response", res.data)
+            }).catch(err=>console.log(err))
         },
     },
     mounted(){

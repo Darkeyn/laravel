@@ -28,7 +28,8 @@
                 
                 <div style="text-align:center;">
                     <button @click.prevent="addNewProject" type="submit" class="btn btn-primary mt-2">Создать проект</button>
-                </div>           
+                </div>
+
             </div>
         </form>
     </div>
@@ -39,6 +40,7 @@
 export default {
     data(){
         return{
+            user: [],
             form:{
                 name: '',
                 adress: '',
@@ -46,7 +48,8 @@ export default {
                 admin_login: '',
                 admin_password: '',
             },
-            errors:[]
+            errors:[],
+            projectId: '',
         }
     },
     methods:{
@@ -57,12 +60,41 @@ export default {
                 ssh: this.form.ssh,
                 admin_login: this.form.admin_login,
                 admin_password: this.form.admin_password
-            }).then(() => {
+            }).then(res => {
+                this.projectId = res.data
+                axios.post('/api/projectsinfo', {
+                    user_id: this.user.id,
+                    project_id: this.projectId,
+                    permission: '2'
+                })
                 this.$router.push({name: 'home'});
             }).catch((error) =>{
                 this.errors = error.data.errors;
             })
+        },
+        getUser(){
+            axios.post('/api/user', {token: this.$store.state.token})
+            .then (res => {
+                this.user = res.data
+            })
+        },
+    },
+    mounted(){
+        if (this.$store.state.token !== '') {
+            axios.post('/api/checkToken', {token : this.$store.state.token})
+            .then(res => {
+                this.getUser();
+                this.loading = false;
+            })
+            .catch(err => {
+                this.loading = false;
+                this.$store.commit('clearToken');
+                this.$router.push('/login');
+            })
+        }else {
+            this.loading = false;
+            this.$router.push('/login');
         }
-    }
+    },
 }
 </script>

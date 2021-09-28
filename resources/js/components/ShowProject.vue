@@ -1,9 +1,8 @@
 <template>
 
     <div class="container mt-4"> 
-        <!-- <input type="text" v-model="project.name" class="form-control"> -->
         
-        <div class="row justify-content-md-center mt-1">
+        <div class="row justify-content-md-center mt-1 border-bottom border-dark">
             <div class="col col-lg-4">
                 <h4>Id проекта: </h4>
             </div>
@@ -12,7 +11,7 @@
             </div>
         </div>
 
-        <div class="row justify-content-md-center mt-1">
+        <div class="row justify-content-md-center mt-1 border-bottom border-dark">
             <div class="col col-lg-4">
                 <h4>Название проекта: </h4>
             </div>
@@ -21,7 +20,7 @@
             </div>
         </div>
 
-        <div class="row justify-content-md-center mt-1">
+        <div class="row justify-content-md-center mt-1 border-bottom border-dark">
             <div class="col col-lg-4">
                 <h4>Сайт проекта: </h4>
             </div>
@@ -30,7 +29,7 @@
             </div>
         </div>
 
-        <div class="row justify-content-md-center mt-1">
+        <div class="row justify-content-md-center mt-1 border-bottom border-dark" v-if="project.admin_login !== null">
             <div class="col col-lg-4">
                 <h4>Логин администратора: </h4>
             </div>
@@ -39,7 +38,7 @@
             </div>
         </div>
 
-        <div class="row justify-content-md-center mt-1 mb-3">
+        <div class="row justify-content-md-center mt-1 mb-3" v-if="project.admin_password !== null">
             <div class="col col-lg-4">
                 <h4>Пароль администратора: </h4>
             </div>
@@ -50,31 +49,31 @@
 
         <h1>Пользователи проекта:</h1>
 
-        <div class="row justify-content-md-center mb-3">
-            <div class="col col-lg-2 mt-2">
+        <div class="row justify-content-md-center mb-1">
+            <div class="col col-lg-2 mt-2 text-center">
                 <h4>Id</h4>
             </div>
             <div class="col col-lg-6 mt-2">
                 <h4>Имя</h4>
             </div>
-            <div class="col col-lg-4 mt-2">
+            <div class="col col-lg-4 mt-2 text-center">
                 <h4>Права</h4>
             </div>
         </div>
 
         <div class="row justify-content-md-center" v-for="user in project.users" :key="user.id">
-            <div class="col col-lg-2">
+            <div class="col col-lg-2 border border-right-0 border-dark text-center pt-2">
                 <h4>{{user.id}}</h4>
             </div>
-            <div class="col col-lg-6">
+            <div class="col col-lg-6 border border-right-0 border-dark pt-2">
                 <router-link :to="{name: 'showUser', params: {userId: user.id}}" class="">
                     <h4>{{user.name}}</h4>
                 </router-link>
             </div>
-            <div class="col col-lg-4" v-if="user.pivot.permission === 1">
+            <div class="col col-lg-4 border border-dark text-center pt-2" v-if="user.pivot.permission === 1">
                     <h4>Редактирование</h4>
             </div>
-            <div class="col col-lg-4" v-if="user.pivot.permission === 2">
+            <div class="col col-lg-4 border border-dark text-center pt-2" v-if="user.pivot.permission === 2">
                     <h4>Администрирование</h4>
             </div>
         </div>
@@ -96,7 +95,7 @@ export default {
     data() {
         return{
             project: [],
-            loading: true
+            loading: true,
         }
     },
     mounted(){
@@ -121,8 +120,10 @@ export default {
         axios.get('/api/projects/' + this.projectId)
         .then (response => {
             this.project = response.data.data
+            this.isLoginEmpty(this.project.admin_login)
+            this.isPassEmpty(this.project.admin_password)
         })
-        },
+        }
     },
 }
 </script>

@@ -20,7 +20,7 @@ class AccessController extends Controller
             'project_id', '=', $project_id
         )->where(
             'user_id', '=', $user_id
-        ));
+        ))->first();
 
         // return "Hello $user_id, project $project_id";
 

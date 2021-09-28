@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AccessController;
+use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\ProjectUserController;
 use App\Http\Controllers\Api\UserController;
@@ -37,6 +38,7 @@ Route::apiResources([
     'projectsinfo' => ProjectUserController::class,
 ]);
 
+Route::post('fileadd', [FileController::class,'fileadd']);
 
 Route::group([
 
@@ -50,6 +52,7 @@ Route::group([
     //Route::post('refresh', [AuthController::class,'refresh']);
     Route::post('user', [LoginController::class,'user']);
     Route::post('checkToken', [LoginController::class,'checkToken']);
+    //Route::post('fileadd', [FileController::class,'fileadd']);
     //Route::post('admin', [AdminController::class,'index']);
 
 });

@@ -7,6 +7,7 @@ use App\Http\Requests\ProjectStoreRequest;
 use App\Http\Requests\ProjectUpdateRequest;
 use App\Http\Resources\ProjectResource;
 use App\Models\Project;
+use App\Models\ProjectUser;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -31,8 +32,10 @@ class ProjectController extends Controller
     public function store(ProjectStoreRequest $request)
     {
         $created_project = Project::create($request->validated());
+        $projectId = $created_project->id;
 
-        return new ProjectResource($created_project);
+        return $projectId;
+        // new ProjectResource($created_project)
     }
 
     /**

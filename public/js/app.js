@@ -2189,29 +2189,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
       access: [],
       projects: [],
       userinfo: [],
-      // projectsinfo: [],
-      loading: true,
-      admin: false,
-      redactor: false
+      loading: true
     };
   },
   mounted: function mounted() {
@@ -2239,18 +2223,10 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
-    // pencilFunc: function () {
-    //         for (projectinfo in projectsinfo){
-    //             if (project.id == projectinfo.project_id && user.id == projectinfo.user_id && projectinfo.permission == 2)
-    //                 return false
-    //             else
-    //                 return true
-    //         }
-    // },
     deleteProject: function deleteProject(id) {
       var _this2 = this;
 
-      if (confirm('Удалить проет?')) {
+      if (confirm('Удалить проект?')) {
         axios.post('/api/projects/' + id, {
           _method: 'DELETE'
         }).then(function (response) {
@@ -2267,12 +2243,18 @@ __webpack_require__.r(__webpack_exports__);
         _this3.projects = response.data.data;
       })["finally"](function () {
         _this3.loading = false;
-      }); // axios.get('/api/projectsinfo').then((res)=>{
-      //     this.projectsinfo = res.data.data
-      // })
+      });
     },
     goproject: function goproject() {
       this.$router.push('/newproject');
+    },
+    goprojectred: function goprojectred(project_id) {
+      this.$router.push({
+        name: 'ProjectView',
+        params: {
+          projectId: project_id
+        }
+      });
     },
     getUser: function getUser() {
       var _this4 = this;
@@ -2283,23 +2265,41 @@ __webpack_require__.r(__webpack_exports__);
         _this4.userinfo = res.data;
       });
     },
-    Access: function Access(project_id, userinfo_id) {
+    AccessRed: function AccessRed(project_id, userinfo_id) {
       var _this5 = this;
 
-      console.log("1"), axios.post('/api/access/' + project_id + '/' + userinfo_id, {
+      axios.post('/api/access/' + project_id + '/' + userinfo_id, {
         token: this.$store.state.token
       }).then(function (response) {
-        _this5.access = response.data.data;
-      });
-    } // userAcces(projectsinfo){
-    //     this.admin = false, 
-    //     this.redactor = false
-    //         console.log(this.projectsinfo)
-    //     for(this.everyProject in projectsinfo){
-    //         console.log(this.everyProject.id)
-    //     }
-    // }
+        _this5.access = response.data.data; // console.log(this.access.permission)
 
+        if (_this5.access.permission === 1 || _this5.access.permission === 2) {
+          _this5.$router.push({
+            name: 'ProjectView',
+            params: {
+              projectId: project_id
+            }
+          });
+        } else {
+          console.log('Нет прав');
+        }
+      });
+    },
+    AccessUd: function AccessUd(project_id, userinfo_id) {
+      var _this6 = this;
+
+      axios.post('/api/access/' + project_id + '/' + userinfo_id, {
+        token: this.$store.state.token
+      }).then(function (response) {
+        _this6.access = response.data.data; // console.log(this.access.permission)
+
+        if (_this6.access.permission === 2) {
+          _this6.deleteProject(project_id);
+        } else {
+          console.log('Нет прав');
+        }
+      });
+    }
   }
 });
 
@@ -2445,9 +2445,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
+      user: [],
       form: {
         name: '',
         adress: '',
@@ -2455,7 +2457,8 @@ __webpack_require__.r(__webpack_exports__);
         admin_login: '',
         admin_password: ''
       },
-      errors: []
+      errors: [],
+      projectId: ''
     };
   },
   methods: {
@@ -2468,13 +2471,51 @@ __webpack_require__.r(__webpack_exports__);
         ssh: this.form.ssh,
         admin_login: this.form.admin_login,
         admin_password: this.form.admin_password
-      }).then(function () {
+      }).then(function (res) {
+        _this.projectId = res.data;
+        axios.post('/api/projectsinfo', {
+          user_id: _this.user.id,
+          project_id: _this.projectId,
+          permission: '2'
+        });
+
         _this.$router.push({
           name: 'home'
         });
       })["catch"](function (error) {
         _this.errors = error.data.errors;
       });
+    },
+    getUser: function getUser() {
+      var _this2 = this;
+
+      axios.post('/api/user', {
+        token: this.$store.state.token
+      }).then(function (res) {
+        _this2.user = res.data;
+      });
+    }
+  },
+  mounted: function mounted() {
+    var _this3 = this;
+
+    if (this.$store.state.token !== '') {
+      axios.post('/api/checkToken', {
+        token: this.$store.state.token
+      }).then(function (res) {
+        _this3.getUser();
+
+        _this3.loading = false;
+      })["catch"](function (err) {
+        _this3.loading = false;
+
+        _this3.$store.commit('clearToken');
+
+        _this3.$router.push('/login');
+      });
+    } else {
+      this.loading = false;
+      this.$router.push('/login');
     }
   }
 });
@@ -2561,12 +2602,56 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: ['projectId'],
   data: function data() {
     return {
       project: [],
-      loading: true
+      loading: true,
+      form: {
+        ssh: null
+      }
     };
   },
   methods: {
@@ -2588,6 +2673,18 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.get('/api/projects/' + this.projectId).then(function (response) {
         _this2.project = response.data.data;
+      });
+    },
+    onChangeSsh: function onChangeSsh(e) {
+      console.log("selected file", e.target.files[0]);
+      this.form.ssh = e.target.files[0];
+    },
+    submit: function submit() {
+      var fd = new FormData();
+      axios.post('/api/fileadd/', fd).then(function (res) {
+        console.log("Response", res.data);
+      })["catch"](function (err) {
+        return console.log(err);
       });
     }
   },
@@ -2817,7 +2914,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: ['projectId'],
   data: function data() {
@@ -2854,6 +2950,10 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.get('/api/projects/' + this.projectId).then(function (response) {
         _this2.project = response.data.data;
+
+        _this2.isLoginEmpty(_this2.project.admin_login);
+
+        _this2.isPassEmpty(_this2.project.admin_password);
       });
     }
   }
@@ -3308,6 +3408,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -3370,6 +3473,14 @@ __webpack_require__.r(__webpack_exports__);
         token: this.$store.state.token
       }).then(function (res) {
         _this4.user = res.data;
+      });
+    },
+    gouserred: function gouserred(oneuser_id) {
+      this.$router.push({
+        name: 'showUser',
+        params: {
+          userId: oneuser_id
+        }
       });
     }
   }
@@ -40196,18 +40307,23 @@ var render = function() {
       _vm._l(_vm.projects, function(project) {
         return _c(
           "div",
-          {
-            key: project.id,
-            staticClass: "row justify-content-md-center mb-1"
-          },
+          { key: project.id, staticClass: "row justify-content-md-center" },
           [
-            _c("div", { staticClass: "col col-lg-2" }, [
-              _c("h4", [_vm._v(_vm._s(project.id))])
-            ]),
+            _c(
+              "div",
+              {
+                staticClass:
+                  "col col-lg-2 border border-right-0 border-dark text-center pt-2"
+              },
+              [_c("h4", [_vm._v(_vm._s(project.id))])]
+            ),
             _vm._v(" "),
             _c(
               "div",
-              { staticClass: "col col-lg-5" },
+              {
+                staticClass:
+                  "col col-lg-5 border border-right-0 border-dark pt-2"
+              },
               [
                 _c(
                   "router-link",
@@ -40228,15 +40344,19 @@ var render = function() {
             _vm.userinfo.role === "Admin"
               ? _c(
                   "div",
-                  { staticClass: "col col-lg-2" },
+                  {
+                    staticClass:
+                      "col col-lg-2 border border-right-0 border-dark text-center pt-1"
+                  },
                   [
                     _c(
-                      "router-link",
+                      "button",
                       {
-                        attrs: {
-                          to: {
-                            name: "ProjectView",
-                            params: { projectId: project.id }
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.goprojectred(project.id)
                           }
                         }
                       },
@@ -40264,108 +40384,142 @@ var render = function() {
                         )
                       ]
                     )
-                  ],
-                  1
+                  ]
                 )
-              : _c("div", { staticClass: "col col-lg-2" }, [
-                  _c(
-                    "svg",
-                    {
-                      staticClass: "bi bi-pencil",
-                      attrs: {
-                        xmlns: "http://www.w3.org/2000/svg",
-                        width: "16",
-                        height: "16",
-                        fill: "currentColor",
-                        viewBox: "0 0 16 16"
-                      }
-                    },
-                    [
-                      _c("path", {
-                        attrs: {
-                          d:
-                            "M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"
+              : _c(
+                  "div",
+                  {
+                    staticClass:
+                      "col col-lg-2 border border-right-0 border-dark text-center pt-1"
+                  },
+                  [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.AccessRed(project.id, _vm.userinfo.id)
+                          }
                         }
-                      })
-                    ]
-                  )
-                ]),
+                      },
+                      [
+                        _c(
+                          "svg",
+                          {
+                            staticClass: "bi bi-pencil",
+                            attrs: {
+                              xmlns: "http://www.w3.org/2000/svg",
+                              width: "16",
+                              height: "16",
+                              fill: "currentColor",
+                              viewBox: "0 0 16 16"
+                            }
+                          },
+                          [
+                            _c("path", {
+                              attrs: {
+                                d:
+                                  "M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"
+                              }
+                            })
+                          ]
+                        )
+                      ]
+                    )
+                  ]
+                ),
             _vm._v(" "),
             _vm.userinfo.role === "Admin"
-              ? _c("div", { staticClass: "col col-lg-2" }, [
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-danger",
-                      attrs: { type: "button" },
-                      on: {
-                        click: function($event) {
-                          return _vm.deleteProject(project.id)
-                        }
-                      }
-                    },
-                    [
-                      _c(
-                        "svg",
-                        {
-                          staticClass: "bi bi-bucket",
-                          attrs: {
-                            xmlns: "http://www.w3.org/2000/svg",
-                            width: "16",
-                            height: "16",
-                            fill: "currentColor",
-                            viewBox: "0 0 16 16"
+              ? _c(
+                  "div",
+                  {
+                    staticClass:
+                      "col col-lg-2 border border-dark text-center pt-1"
+                  },
+                  [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-danger",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.deleteProject(project.id)
                           }
-                        },
-                        [
-                          _c("path", {
-                            attrs: {
-                              d:
-                                "M2.522 5H2a.5.5 0 0 0-.494.574l1.372 9.149A1.5 1.5 0 0 0 4.36 16h7.278a1.5 1.5 0 0 0 1.483-1.277l1.373-9.149A.5.5 0 0 0 14 5h-.522A5.5 5.5 0 0 0 2.522 5zm1.005 0a4.5 4.5 0 0 1 8.945 0H3.527zm9.892 1-1.286 8.574a.5.5 0 0 1-.494.426H4.36a.5.5 0 0 1-.494-.426L2.58 6h10.838z"
-                            }
-                          })
-                        ]
-                      )
-                    ]
-                  )
-                ])
-              : _c("div", { staticClass: "col col-lg-2" }, [
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-danger",
-                      attrs: { type: "button", disabled: "" },
-                      on: {
-                        click: function($event) {
-                          return _vm.deleteProject(project.id)
                         }
-                      }
-                    },
-                    [
-                      _c(
-                        "svg",
-                        {
-                          staticClass: "bi bi-bucket",
-                          attrs: {
-                            xmlns: "http://www.w3.org/2000/svg",
-                            width: "16",
-                            height: "16",
-                            fill: "currentColor",
-                            viewBox: "0 0 16 16"
-                          }
-                        },
-                        [
-                          _c("path", {
+                      },
+                      [
+                        _c(
+                          "svg",
+                          {
+                            staticClass: "bi bi-bucket",
                             attrs: {
-                              d:
-                                "M2.522 5H2a.5.5 0 0 0-.494.574l1.372 9.149A1.5 1.5 0 0 0 4.36 16h7.278a1.5 1.5 0 0 0 1.483-1.277l1.373-9.149A.5.5 0 0 0 14 5h-.522A5.5 5.5 0 0 0 2.522 5zm1.005 0a4.5 4.5 0 0 1 8.945 0H3.527zm9.892 1-1.286 8.574a.5.5 0 0 1-.494.426H4.36a.5.5 0 0 1-.494-.426L2.58 6h10.838z"
+                              xmlns: "http://www.w3.org/2000/svg",
+                              width: "16",
+                              height: "16",
+                              fill: "currentColor",
+                              viewBox: "0 0 16 16"
                             }
-                          })
-                        ]
-                      )
-                    ]
-                  )
-                ])
+                          },
+                          [
+                            _c("path", {
+                              attrs: {
+                                d:
+                                  "M2.522 5H2a.5.5 0 0 0-.494.574l1.372 9.149A1.5 1.5 0 0 0 4.36 16h7.278a1.5 1.5 0 0 0 1.483-1.277l1.373-9.149A.5.5 0 0 0 14 5h-.522A5.5 5.5 0 0 0 2.522 5zm1.005 0a4.5 4.5 0 0 1 8.945 0H3.527zm9.892 1-1.286 8.574a.5.5 0 0 1-.494.426H4.36a.5.5 0 0 1-.494-.426L2.58 6h10.838z"
+                              }
+                            })
+                          ]
+                        )
+                      ]
+                    )
+                  ]
+                )
+              : _c(
+                  "div",
+                  {
+                    staticClass:
+                      "col col-lg-2 border border-dark text-center pt-1"
+                  },
+                  [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-danger",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.AccessUd(project.id, _vm.userinfo.id)
+                          }
+                        }
+                      },
+                      [
+                        _c(
+                          "svg",
+                          {
+                            staticClass: "bi bi-bucket",
+                            attrs: {
+                              xmlns: "http://www.w3.org/2000/svg",
+                              width: "16",
+                              height: "16",
+                              fill: "currentColor",
+                              viewBox: "0 0 16 16"
+                            }
+                          },
+                          [
+                            _c("path", {
+                              attrs: {
+                                d:
+                                  "M2.522 5H2a.5.5 0 0 0-.494.574l1.372 9.149A1.5 1.5 0 0 0 4.36 16h7.278a1.5 1.5 0 0 0 1.483-1.277l1.373-9.149A.5.5 0 0 0 14 5h-.522A5.5 5.5 0 0 0 2.522 5zm1.005 0a4.5 4.5 0 0 1 8.945 0H3.527zm9.892 1-1.286 8.574a.5.5 0 0 1-.494.426H4.36a.5.5 0 0 1-.494-.426L2.58 6h10.838z"
+                              }
+                            })
+                          ]
+                        )
+                      ]
+                    )
+                  ]
+                )
           ]
         )
       }),
@@ -40384,8 +40538,8 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row justify-content-md-center mb-3" }, [
-      _c("div", { staticClass: "col col-lg-2" }, [
+    return _c("div", { staticClass: "row justify-content-md-center mb-2" }, [
+      _c("div", { staticClass: "col col-lg-2  text-center" }, [
         _c("h4", [_vm._v("Id проекта")])
       ]),
       _vm._v(" "),
@@ -40393,11 +40547,11 @@ var staticRenderFns = [
         _c("h4", [_vm._v("Название")])
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "col col-lg-2" }, [
+      _c("div", { staticClass: "col col-lg-2 text-center" }, [
         _c("h4", [_vm._v("Редактирование")])
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "col col-lg-2" }, [
+      _c("div", { staticClass: "col col-lg-2  text-center" }, [
         _c("h4", [_vm._v("Удаление")])
       ])
     ])
@@ -40758,145 +40912,251 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "container mt-4" }, [
-    _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
-      _vm._m(0),
-      _vm._v(" "),
-      _c("div", { staticClass: "col col-lg-4" }, [
-        _c("h4", [_vm._v(_vm._s(_vm.project.id))])
+  return _c(
+    "div",
+    { staticClass: "container mt-4" },
+    [
+      _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
+        _c("div", { staticClass: "col col-lg-10" }, [
+          _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
+            _vm._m(0),
+            _vm._v(" "),
+            _c("div", { staticClass: "col col-lg-4" }, [
+              _c("h4", [_vm._v(_vm._s(_vm.project.id))])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col col-lg-4" })
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
+            _vm._m(1),
+            _vm._v(" "),
+            _c("div", { staticClass: "col col-lg-4" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.project.name,
+                    expression: "project.name"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text" },
+                domProps: { value: _vm.project.name },
+                on: {
+                  blur: _vm.saveData,
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.project, "name", $event.target.value)
+                  }
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col col-lg-4" })
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
+            _vm._m(2),
+            _vm._v(" "),
+            _c("div", { staticClass: "col col-lg-4" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.project.adress,
+                    expression: "project.adress"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text" },
+                domProps: { value: _vm.project.adress },
+                on: {
+                  blur: _vm.saveData,
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.project, "adress", $event.target.value)
+                  }
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col col-lg-4" })
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
+            _vm._m(3),
+            _vm._v(" "),
+            _c("div", { staticClass: "col col-lg-4" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.project.admin_login,
+                    expression: "project.admin_login"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text" },
+                domProps: { value: _vm.project.admin_login },
+                on: {
+                  blur: _vm.saveData,
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.project, "admin_login", $event.target.value)
+                  }
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col col-lg-4" })
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
+            _vm._m(4),
+            _vm._v(" "),
+            _c("div", { staticClass: "col col-lg-4" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.project.admin_password,
+                    expression: "project.admin_password"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { type: "text" },
+                domProps: { value: _vm.project.admin_password },
+                on: {
+                  blur: _vm.saveData,
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.project, "admin_password", $event.target.value)
+                  }
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col col-lg-4" })
+          ])
+        ]),
+        _vm._v(" "),
+        _vm.project.ssh === null
+          ? _c("div", { staticClass: "col col-lg-2" }, [
+              _c(
+                "form",
+                {
+                  on: {
+                    submit: function($event) {
+                      $event.preventDefault()
+                      return _vm.submit.apply(null, arguments)
+                    }
+                  }
+                },
+                [
+                  _c("input", {
+                    staticClass: "mb-3",
+                    attrs: { type: "file" },
+                    on: { change: _vm.onChangeSsh }
+                  }),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-danger",
+                      attrs: { type: "submit" }
+                    },
+                    [_vm._v("Загрузить ssh")]
+                  )
+                ]
+              )
+            ])
+          : _vm._e()
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "col col-lg-4" })
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
-      _vm._m(1),
+      _c("h1", [_vm._v("Пользователи проекта:")]),
       _vm._v(" "),
-      _c("div", { staticClass: "col col-lg-4" }, [
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.project.name,
-              expression: "project.name"
-            }
-          ],
-          staticClass: "form-control",
-          attrs: { type: "text" },
-          domProps: { value: _vm.project.name },
-          on: {
-            blur: _vm.saveData,
-            input: function($event) {
-              if ($event.target.composing) {
-                return
-              }
-              _vm.$set(_vm.project, "name", $event.target.value)
-            }
-          }
-        })
-      ]),
+      _vm._m(5),
       _vm._v(" "),
-      _c("div", { staticClass: "col col-lg-4" })
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
-      _vm._m(2),
+      _vm._l(_vm.project.users, function(user) {
+        return _c(
+          "div",
+          { key: user.id, staticClass: "row justify-content-md-center" },
+          [
+            _c(
+              "div",
+              {
+                staticClass:
+                  "col col-lg-2 border border-right-0 border-dark text-center pt-2"
+              },
+              [_c("h4", [_vm._v(_vm._s(user.id))])]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                staticClass:
+                  "col col-lg-6 border border-right-0 border-dark pt-2"
+              },
+              [
+                _c(
+                  "router-link",
+                  {
+                    attrs: {
+                      to: { name: "showUser", params: { userId: user.id } }
+                    }
+                  },
+                  [_c("h4", [_vm._v(_vm._s(user.name))])]
+                )
+              ],
+              1
+            ),
+            _vm._v(" "),
+            user.pivot.permission === 1
+              ? _c(
+                  "div",
+                  {
+                    staticClass:
+                      "col col-lg-4 border border-dark text-center pt-2"
+                  },
+                  [_c("h4", [_vm._v("Редактирование")])]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            user.pivot.permission === 2
+              ? _c(
+                  "div",
+                  {
+                    staticClass:
+                      "col col-lg-4 border border-dark text-center pt-2"
+                  },
+                  [_c("h4", [_vm._v("Администрирование")])]
+                )
+              : _vm._e()
+          ]
+        )
+      }),
       _vm._v(" "),
-      _c("div", { staticClass: "col col-lg-4" }, [
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.project.adress,
-              expression: "project.adress"
-            }
-          ],
-          staticClass: "form-control",
-          attrs: { type: "text" },
-          domProps: { value: _vm.project.adress },
-          on: {
-            blur: _vm.saveData,
-            input: function($event) {
-              if ($event.target.composing) {
-                return
-              }
-              _vm.$set(_vm.project, "adress", $event.target.value)
-            }
-          }
-        })
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col col-lg-4" })
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
-      _vm._m(3),
-      _vm._v(" "),
-      _c("div", { staticClass: "col col-lg-4" }, [
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.project.admin_login,
-              expression: "project.admin_login"
-            }
-          ],
-          staticClass: "form-control",
-          attrs: { type: "text" },
-          domProps: { value: _vm.project.admin_login },
-          on: {
-            blur: _vm.saveData,
-            input: function($event) {
-              if ($event.target.composing) {
-                return
-              }
-              _vm.$set(_vm.project, "admin_login", $event.target.value)
-            }
-          }
-        })
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col col-lg-4" })
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
-      _vm._m(4),
-      _vm._v(" "),
-      _c("div", { staticClass: "col col-lg-4" }, [
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.project.admin_password,
-              expression: "project.admin_password"
-            }
-          ],
-          staticClass: "form-control",
-          attrs: { type: "text" },
-          domProps: { value: _vm.project.admin_password },
-          on: {
-            blur: _vm.saveData,
-            input: function($event) {
-              if ($event.target.composing) {
-                return
-              }
-              _vm.$set(_vm.project, "admin_password", $event.target.value)
-            }
-          }
-        })
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col col-lg-4" })
-    ]),
-    _vm._v(" "),
-    _vm.loading
-      ? _c("div", { staticClass: "d-flex justify-content-center" }, [_vm._m(5)])
-      : _vm._e()
-  ])
+      _vm.loading
+        ? _c("div", { staticClass: "d-flex justify-content-center" }, [
+            _vm._m(6)
+          ])
+        : _vm._e()
+    ],
+    2
+  )
 }
 var staticRenderFns = [
   function() {
@@ -40936,7 +41196,25 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "col col-lg-4" }, [
-      _c("h4", [_vm._v("Пароль администратора:: ")])
+      _c("h4", [_vm._v("Пароль администратора: ")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row justify-content-md-center mb-1" }, [
+      _c("div", { staticClass: "col col-lg-2 mt-2 text-center" }, [
+        _c("h4", [_vm._v("Id")])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col col-lg-6 mt-2" }, [
+        _c("h4", [_vm._v("Имя")])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col col-lg-4 mt-2 text-center" }, [
+        _c("h4", [_vm._v("Права")])
+      ])
     ])
   },
   function() {
@@ -41170,45 +41448,81 @@ var render = function() {
     "div",
     { staticClass: "container mt-4" },
     [
-      _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
-        _vm._m(0),
-        _vm._v(" "),
-        _c("div", { staticClass: "col col-lg-8" }, [
-          _c("h4", [_vm._v(_vm._s(_vm.project.id))])
-        ])
-      ]),
+      _c(
+        "div",
+        {
+          staticClass:
+            "row justify-content-md-center mt-1 border-bottom border-dark"
+        },
+        [
+          _vm._m(0),
+          _vm._v(" "),
+          _c("div", { staticClass: "col col-lg-8" }, [
+            _c("h4", [_vm._v(_vm._s(_vm.project.id))])
+          ])
+        ]
+      ),
       _vm._v(" "),
-      _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
-        _vm._m(1),
-        _vm._v(" "),
-        _c("div", { staticClass: "col col-lg-8" }, [
-          _c("h4", [_vm._v(_vm._s(_vm.project.name))])
-        ])
-      ]),
+      _c(
+        "div",
+        {
+          staticClass:
+            "row justify-content-md-center mt-1 border-bottom border-dark"
+        },
+        [
+          _vm._m(1),
+          _vm._v(" "),
+          _c("div", { staticClass: "col col-lg-8" }, [
+            _c("h4", [_vm._v(_vm._s(_vm.project.name))])
+          ])
+        ]
+      ),
       _vm._v(" "),
-      _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
-        _vm._m(2),
-        _vm._v(" "),
-        _c("div", { staticClass: "col col-lg-8" }, [
-          _c("h4", [_vm._v(_vm._s(_vm.project.adress))])
-        ])
-      ]),
+      _c(
+        "div",
+        {
+          staticClass:
+            "row justify-content-md-center mt-1 border-bottom border-dark"
+        },
+        [
+          _vm._m(2),
+          _vm._v(" "),
+          _c("div", { staticClass: "col col-lg-8" }, [
+            _c("h4", [_vm._v(_vm._s(_vm.project.adress))])
+          ])
+        ]
+      ),
       _vm._v(" "),
-      _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
-        _vm._m(3),
-        _vm._v(" "),
-        _c("div", { staticClass: "col col-lg-8" }, [
-          _c("h4", [_vm._v(_vm._s(_vm.project.admin_login))])
-        ])
-      ]),
+      _vm.project.admin_login !== null
+        ? _c(
+            "div",
+            {
+              staticClass:
+                "row justify-content-md-center mt-1 border-bottom border-dark"
+            },
+            [
+              _vm._m(3),
+              _vm._v(" "),
+              _c("div", { staticClass: "col col-lg-8" }, [
+                _c("h4", [_vm._v(_vm._s(_vm.project.admin_login))])
+              ])
+            ]
+          )
+        : _vm._e(),
       _vm._v(" "),
-      _c("div", { staticClass: "row justify-content-md-center mt-1 mb-3" }, [
-        _vm._m(4),
-        _vm._v(" "),
-        _c("div", { staticClass: "col col-lg-8" }, [
-          _c("h4", [_vm._v(_vm._s(_vm.project.admin_password))])
-        ])
-      ]),
+      _vm.project.admin_password !== null
+        ? _c(
+            "div",
+            { staticClass: "row justify-content-md-center mt-1 mb-3" },
+            [
+              _vm._m(4),
+              _vm._v(" "),
+              _c("div", { staticClass: "col col-lg-8" }, [
+                _c("h4", [_vm._v(_vm._s(_vm.project.admin_password))])
+              ])
+            ]
+          )
+        : _vm._e(),
       _vm._v(" "),
       _c("h1", [_vm._v("Пользователи проекта:")]),
       _vm._v(" "),
@@ -41219,13 +41533,21 @@ var render = function() {
           "div",
           { key: user.id, staticClass: "row justify-content-md-center" },
           [
-            _c("div", { staticClass: "col col-lg-2" }, [
-              _c("h4", [_vm._v(_vm._s(user.id))])
-            ]),
+            _c(
+              "div",
+              {
+                staticClass:
+                  "col col-lg-2 border border-right-0 border-dark text-center pt-2"
+              },
+              [_c("h4", [_vm._v(_vm._s(user.id))])]
+            ),
             _vm._v(" "),
             _c(
               "div",
-              { staticClass: "col col-lg-6" },
+              {
+                staticClass:
+                  "col col-lg-6 border border-right-0 border-dark pt-2"
+              },
               [
                 _c(
                   "router-link",
@@ -41241,15 +41563,25 @@ var render = function() {
             ),
             _vm._v(" "),
             user.pivot.permission === 1
-              ? _c("div", { staticClass: "col col-lg-4" }, [
-                  _c("h4", [_vm._v("Редактирование")])
-                ])
+              ? _c(
+                  "div",
+                  {
+                    staticClass:
+                      "col col-lg-4 border border-dark text-center pt-2"
+                  },
+                  [_c("h4", [_vm._v("Редактирование")])]
+                )
               : _vm._e(),
             _vm._v(" "),
             user.pivot.permission === 2
-              ? _c("div", { staticClass: "col col-lg-4" }, [
-                  _c("h4", [_vm._v("Администрирование")])
-                ])
+              ? _c(
+                  "div",
+                  {
+                    staticClass:
+                      "col col-lg-4 border border-dark text-center pt-2"
+                  },
+                  [_c("h4", [_vm._v("Администрирование")])]
+                )
               : _vm._e()
           ]
         )
@@ -41309,8 +41641,8 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row justify-content-md-center mb-3" }, [
-      _c("div", { staticClass: "col col-lg-2 mt-2" }, [
+    return _c("div", { staticClass: "row justify-content-md-center mb-1" }, [
+      _c("div", { staticClass: "col col-lg-2 mt-2 text-center" }, [
         _c("h4", [_vm._v("Id")])
       ]),
       _vm._v(" "),
@@ -41318,7 +41650,7 @@ var staticRenderFns = [
         _c("h4", [_vm._v("Имя")])
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "col col-lg-4 mt-2" }, [
+      _c("div", { staticClass: "col col-lg-4 mt-2 text-center" }, [
         _c("h4", [_vm._v("Права")])
       ])
     ])
@@ -41945,13 +42277,21 @@ var render = function() {
               "div",
               { key: oneuser.id, staticClass: "row justify-content-md-center" },
               [
-                _c("div", { staticClass: "col col-lg-1" }, [
-                  _c("h4", [_vm._v(_vm._s(oneuser.id))])
-                ]),
+                _c(
+                  "div",
+                  {
+                    staticClass:
+                      "col col-lg-1 border border-right-0 border-dark text-center pt-2"
+                  },
+                  [_c("h4", [_vm._v(_vm._s(oneuser.id))])]
+                ),
                 _vm._v(" "),
                 _c(
                   "div",
-                  { staticClass: "col col-lg-2" },
+                  {
+                    staticClass:
+                      "col col-lg-2 border border-right-0 border-dark pt-2"
+                  },
                   [
                     _c(
                       "router-link",
@@ -41969,25 +42309,39 @@ var render = function() {
                   1
                 ),
                 _vm._v(" "),
-                _c("div", { staticClass: "col col-lg-4" }, [
-                  _c("h4", [_vm._v(_vm._s(oneuser.email))])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "col col-lg-1" }, [
-                  _c("h4", [_vm._v(_vm._s(oneuser.role))])
-                ]),
+                _c(
+                  "div",
+                  {
+                    staticClass:
+                      "col col-lg-4 border border-right-0 border-dark pt-2"
+                  },
+                  [_c("h4", [_vm._v(_vm._s(oneuser.email))])]
+                ),
                 _vm._v(" "),
                 _c(
                   "div",
-                  { staticClass: "col col-lg-2" },
+                  {
+                    staticClass:
+                      "col col-lg-1 border border-right-0 border-dark text-center pt-2"
+                  },
+                  [_c("h4", [_vm._v(_vm._s(oneuser.role))])]
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    staticClass:
+                      "col col-lg-2 border border-right-0 border-dark text-center pt-1"
+                  },
                   [
                     _c(
-                      "router-link",
+                      "button",
                       {
-                        attrs: {
-                          to: {
-                            name: "showUser",
-                            params: { userId: oneuser.id }
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.gouserred(oneuser.id)
                           }
                         }
                       },
@@ -42015,85 +42369,98 @@ var render = function() {
                         )
                       ]
                     )
-                  ],
-                  1
+                  ]
                 ),
                 _vm._v(" "),
                 _vm.user.id !== oneuser.id
-                  ? _c("div", { staticClass: "col col-lg-2" }, [
-                      _c(
-                        "button",
-                        {
-                          staticClass: "btn btn-danger",
-                          attrs: { type: "button" },
-                          on: {
-                            click: function($event) {
-                              return _vm.deleteUser(oneuser.id)
-                            }
-                          }
-                        },
-                        [
-                          _c(
-                            "svg",
-                            {
-                              staticClass: "bi bi-bucket",
-                              attrs: {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                width: "16",
-                                height: "16",
-                                fill: "currentColor",
-                                viewBox: "0 0 16 16"
+                  ? _c(
+                      "div",
+                      {
+                        staticClass:
+                          "col col-lg-2 border border-dark text-center pt-1"
+                      },
+                      [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-danger",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function($event) {
+                                return _vm.deleteUser(oneuser.id)
                               }
-                            },
-                            [
-                              _c("path", {
-                                attrs: {
-                                  d:
-                                    "M2.522 5H2a.5.5 0 0 0-.494.574l1.372 9.149A1.5 1.5 0 0 0 4.36 16h7.278a1.5 1.5 0 0 0 1.483-1.277l1.373-9.149A.5.5 0 0 0 14 5h-.522A5.5 5.5 0 0 0 2.522 5zm1.005 0a4.5 4.5 0 0 1 8.945 0H3.527zm9.892 1-1.286 8.574a.5.5 0 0 1-.494.426H4.36a.5.5 0 0 1-.494-.426L2.58 6h10.838z"
-                                }
-                              })
-                            ]
-                          )
-                        ]
-                      )
-                    ])
-                  : _c("div", { staticClass: "col col-lg-2" }, [
-                      _c(
-                        "button",
-                        {
-                          staticClass: "btn btn-danger",
-                          attrs: { type: "button", disabled: "" },
-                          on: {
-                            click: function($event) {
-                              return _vm.deleteUser(oneuser.id)
                             }
-                          }
-                        },
-                        [
-                          _c(
-                            "svg",
-                            {
-                              staticClass: "bi bi-bucket",
-                              attrs: {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                width: "16",
-                                height: "16",
-                                fill: "currentColor",
-                                viewBox: "0 0 16 16"
-                              }
-                            },
-                            [
-                              _c("path", {
+                          },
+                          [
+                            _c(
+                              "svg",
+                              {
+                                staticClass: "bi bi-bucket",
                                 attrs: {
-                                  d:
-                                    "M2.522 5H2a.5.5 0 0 0-.494.574l1.372 9.149A1.5 1.5 0 0 0 4.36 16h7.278a1.5 1.5 0 0 0 1.483-1.277l1.373-9.149A.5.5 0 0 0 14 5h-.522A5.5 5.5 0 0 0 2.522 5zm1.005 0a4.5 4.5 0 0 1 8.945 0H3.527zm9.892 1-1.286 8.574a.5.5 0 0 1-.494.426H4.36a.5.5 0 0 1-.494-.426L2.58 6h10.838z"
+                                  xmlns: "http://www.w3.org/2000/svg",
+                                  width: "16",
+                                  height: "16",
+                                  fill: "currentColor",
+                                  viewBox: "0 0 16 16"
                                 }
-                              })
-                            ]
-                          )
-                        ]
-                      )
-                    ])
+                              },
+                              [
+                                _c("path", {
+                                  attrs: {
+                                    d:
+                                      "M2.522 5H2a.5.5 0 0 0-.494.574l1.372 9.149A1.5 1.5 0 0 0 4.36 16h7.278a1.5 1.5 0 0 0 1.483-1.277l1.373-9.149A.5.5 0 0 0 14 5h-.522A5.5 5.5 0 0 0 2.522 5zm1.005 0a4.5 4.5 0 0 1 8.945 0H3.527zm9.892 1-1.286 8.574a.5.5 0 0 1-.494.426H4.36a.5.5 0 0 1-.494-.426L2.58 6h10.838z"
+                                  }
+                                })
+                              ]
+                            )
+                          ]
+                        )
+                      ]
+                    )
+                  : _c(
+                      "div",
+                      {
+                        staticClass:
+                          "col col-lg-2 border border-dark text-center pt-1"
+                      },
+                      [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-danger",
+                            attrs: { type: "button", disabled: "" },
+                            on: {
+                              click: function($event) {
+                                return _vm.deleteUser(oneuser.id)
+                              }
+                            }
+                          },
+                          [
+                            _c(
+                              "svg",
+                              {
+                                staticClass: "bi bi-bucket",
+                                attrs: {
+                                  xmlns: "http://www.w3.org/2000/svg",
+                                  width: "16",
+                                  height: "16",
+                                  fill: "currentColor",
+                                  viewBox: "0 0 16 16"
+                                }
+                              },
+                              [
+                                _c("path", {
+                                  attrs: {
+                                    d:
+                                      "M2.522 5H2a.5.5 0 0 0-.494.574l1.372 9.149A1.5 1.5 0 0 0 4.36 16h7.278a1.5 1.5 0 0 0 1.483-1.277l1.373-9.149A.5.5 0 0 0 14 5h-.522A5.5 5.5 0 0 0 2.522 5zm1.005 0a4.5 4.5 0 0 1 8.945 0H3.527zm9.892 1-1.286 8.574a.5.5 0 0 1-.494.426H4.36a.5.5 0 0 1-.494-.426L2.58 6h10.838z"
+                                  }
+                                })
+                              ]
+                            )
+                          ]
+                        )
+                      ]
+                    )
               ]
             )
           }),
@@ -42115,20 +42482,24 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row justify-content-md-center  mb-4" }, [
-      _c("div", { staticClass: "col col-lg-1" }, [_c("h4", [_vm._v("Id")])]),
+    return _c("div", { staticClass: "row justify-content-md-center  mb-2" }, [
+      _c("div", { staticClass: "col col-lg-1 text-center" }, [
+        _c("h4", [_vm._v("Id")])
+      ]),
       _vm._v(" "),
       _c("div", { staticClass: "col col-lg-2" }, [_c("h4", [_vm._v("Имя")])]),
       _vm._v(" "),
       _c("div", { staticClass: "col col-lg-4" }, [_c("h4", [_vm._v("Почта")])]),
       _vm._v(" "),
-      _c("div", { staticClass: "col col-lg-1" }, [_c("h4", [_vm._v("Роль")])]),
+      _c("div", { staticClass: "col col-lg-1 text-center" }, [
+        _c("h4", [_vm._v("Роль")])
+      ]),
       _vm._v(" "),
-      _c("div", { staticClass: "col col-lg-2" }, [
+      _c("div", { staticClass: "col col-lg-2 text-center" }, [
         _c("h4", [_vm._v("Редактирование")])
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "col col-lg-2" }, [
+      _c("div", { staticClass: "col col-lg-2 text-center" }, [
         _c("h4", [_vm._v("Удаление")])
       ])
     ])
