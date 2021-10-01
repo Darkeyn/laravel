@@ -39,6 +39,7 @@ Route::apiResources([
 ]);
 
 Route::post('fileadd', [FileController::class,'fileadd']);
+Route::post('filedel/{ssh}', [FileController::class,'filedel']);
 
 Route::group([
 

@@ -24,7 +24,7 @@ class ProjectFactory extends Factory
         return [
             'name' => $this->faker->unique()->name(),
             'adress' => $this->faker->sentence(),
-            'ssh' => $this->faker->sentence(),
+            'ssh' => null,
             'admin_login' => $this->faker->word(),
             'admin_password' => $this->faker->word()
         ];

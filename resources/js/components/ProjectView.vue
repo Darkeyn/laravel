@@ -37,6 +37,23 @@
             </div>
         </div>
 
+        <div class="row justify-content-md-center mt-2" v-if="project.ssh === null">
+            <div class="col col-lg-4">
+                <h4>Файл ssh: </h4>
+            </div>
+            <div class="col col-lg-8">
+                    <h4>Файл с ключом ssh отсутствует</h4>
+            </div>
+        </div>
+        <div class="row justify-content-md-center mt-2" v-else>
+            <div class="col col-lg-4">
+                <h4>Файл ssh: </h4>
+            </div>
+            <div class="col col-lg-8">
+                    <a v-bind:href="project.ssh">Скачать файл ssh</a>
+            </div>
+        </div>
+
         <div class="row justify-content-md-center mt-1">
             <div class="col col-lg-4">
                 <h4>Логин администратора: </h4>
@@ -64,6 +81,9 @@
                     <input type="file" class="mb-3" @change="onChangeSsh">
                     <button type="submit" class="btn btn-danger">Загрузить ssh</button>
                 </form>
+            </div>
+            <div class="col col-lg-2" v-else>
+                <button type="button" class="btn btn-danger" @click.prevent="deleteSsh">Удалить ssh</button>
             </div>
         </div>
 
@@ -115,6 +135,7 @@ export default {
     ],
     data() {
         return{
+            sshlink: "",
             project: [],
             loading: true,
             form:{
@@ -132,6 +153,33 @@ export default {
             admin_password: this.project.admin_password,
         })
         .finally(()=>{
+            this.thisProjectData();
+            this.loading = false
+        })
+        },
+        saveSsh(){
+        axios.post('/api/projects/' + this.projectId, {
+            _method: 'PUT',
+            name: this.project.name,
+            adress: this.project.adress,
+            ssh: this.sshlink,
+        })
+        .finally(()=>{
+            this.thisProjectData();
+            this.loading = false
+        })
+        },
+        deleteSsh(){
+            axios.post('/api/filedel/' + this.sshlink.substr(this.sshlink.lastIndexOf("/")+1)).then(res=>{
+            }).catch(err=>console.log(err))
+            axios.post('/api/projects/' + this.projectId, {
+                _method: 'PUT',
+                name: this.project.name,
+                adress: this.project.adress,
+                ssh: null,
+        })
+        .finally(()=>{
+            this.thisProjectData();
             this.loading = false
         })
         },
@@ -139,6 +187,7 @@ export default {
             axios.get('/api/projects/' + this.projectId)
             .then (response => {
                 this.project = response.data.data
+                this.sshlink = response.data.data.ssh
             })
         },
         onChangeSsh(e){
@@ -147,8 +196,11 @@ export default {
         },
         submit(){
             let fd = new FormData();
+            fd.append('ssh', this.form.ssh);
             axios.post('/api/fileadd/', fd).then(res=>{
-                console.log("Response", res.data)
+                this.sshlink = res.data[0]
+                this.saveSsh()
+                console.log(this.sshlink)
             }).catch(err=>console.log(err))
         },
     },

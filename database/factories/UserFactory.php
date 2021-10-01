@@ -23,12 +23,23 @@ class UserFactory extends Factory
      */
     public function definition()
     {
+        // User
         return [
             'name' => $this->faker->unique()->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'role' => 'User',
-            'password' => '$2y$10$UgH.VpOD4gbDUpUkUxVHz.7UMbhWGaAv.r7Qyywpu4/.5kPrAChum', // password
+            'password' => '$2y$10$lNhdC75bfqnZq/I/Fm7U2.y..avQtSP5fyW5vDgBnUryDQ4ZYyd1K', // password - 12345678
         ];
+
+        // Admin
+        //-----------------------------------------------------------------------------------------------------------
+        // return [
+        //     'name' => 'Admin',
+        //     'email' => 'admin.admin@yandex.ru',
+        //     'role' => 'Admin',
+        //     'password' => '$2y$10$lNhdC75bfqnZq/I/Fm7U2.y..avQtSP5fyW5vDgBnUryDQ4ZYyd1K', // password - 12345678
+        // ];
+        //-----------------------------------------------------------------------------------------------------------
     }
 
     /**

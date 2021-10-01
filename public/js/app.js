@@ -2442,10 +2442,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -2453,7 +2449,6 @@ __webpack_require__.r(__webpack_exports__);
       form: {
         name: '',
         adress: '',
-        ssh: '',
         admin_login: '',
         admin_password: ''
       },
@@ -2468,7 +2463,7 @@ __webpack_require__.r(__webpack_exports__);
       axios.post('/api/projects', {
         name: this.form.name,
         adress: this.form.adress,
-        ssh: this.form.ssh,
+        ssh: null,
         admin_login: this.form.admin_login,
         admin_password: this.form.admin_password
       }).then(function (res) {
@@ -2643,10 +2638,31 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: ['projectId'],
   data: function data() {
     return {
+      sshlink: "",
       project: [],
       loading: true,
       form: {
@@ -2665,14 +2681,48 @@ __webpack_require__.r(__webpack_exports__);
         admin_login: this.project.admin_login,
         admin_password: this.project.admin_password
       })["finally"](function () {
+        _this.thisProjectData();
+
         _this.loading = false;
       });
     },
-    thisProjectData: function thisProjectData() {
+    saveSsh: function saveSsh() {
       var _this2 = this;
 
+      axios.post('/api/projects/' + this.projectId, {
+        _method: 'PUT',
+        name: this.project.name,
+        adress: this.project.adress,
+        ssh: this.sshlink
+      })["finally"](function () {
+        _this2.thisProjectData();
+
+        _this2.loading = false;
+      });
+    },
+    deleteSsh: function deleteSsh() {
+      var _this3 = this;
+
+      axios.post('/api/filedel/' + this.sshlink.substr(this.sshlink.lastIndexOf("/") + 1)).then(function (res) {})["catch"](function (err) {
+        return console.log(err);
+      });
+      axios.post('/api/projects/' + this.projectId, {
+        _method: 'PUT',
+        name: this.project.name,
+        adress: this.project.adress,
+        ssh: null
+      })["finally"](function () {
+        _this3.thisProjectData();
+
+        _this3.loading = false;
+      });
+    },
+    thisProjectData: function thisProjectData() {
+      var _this4 = this;
+
       axios.get('/api/projects/' + this.projectId).then(function (response) {
-        _this2.project = response.data.data;
+        _this4.project = response.data.data;
+        _this4.sshlink = response.data.data.ssh;
       });
     },
     onChangeSsh: function onChangeSsh(e) {
@@ -2680,30 +2730,37 @@ __webpack_require__.r(__webpack_exports__);
       this.form.ssh = e.target.files[0];
     },
     submit: function submit() {
+      var _this5 = this;
+
       var fd = new FormData();
+      fd.append('ssh', this.form.ssh);
       axios.post('/api/fileadd/', fd).then(function (res) {
-        console.log("Response", res.data);
+        _this5.sshlink = res.data[0];
+
+        _this5.saveSsh();
+
+        console.log(_this5.sshlink);
       })["catch"](function (err) {
         return console.log(err);
       });
     }
   },
   mounted: function mounted() {
-    var _this3 = this;
+    var _this6 = this;
 
     if (this.$store.state.token !== '') {
       axios.post('/api/checkToken', {
         token: this.$store.state.token
       }).then(function (res) {
-        _this3.thisProjectData();
+        _this6.thisProjectData();
 
-        _this3.loading = false;
+        _this6.loading = false;
       })["catch"](function (err) {
-        _this3.loading = false;
+        _this6.loading = false;
 
-        _this3.$store.commit('clearToken');
+        _this6.$store.commit('clearToken');
 
-        _this3.$router.push('/login');
+        _this6.$router.push('/login');
       });
     } else {
       this.loading = false;
@@ -2914,12 +2971,32 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: ['projectId'],
   data: function data() {
     return {
       project: [],
-      loading: true
+      loading: true,
+      login: '',
+      password: ''
     };
   },
   mounted: function mounted() {
@@ -2950,10 +3027,6 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.get('/api/projects/' + this.projectId).then(function (response) {
         _this2.project = response.data.data;
-
-        _this2.isLoginEmpty(_this2.project.admin_login);
-
-        _this2.isPassEmpty(_this2.project.admin_password);
       });
     }
   }
@@ -40788,30 +40861,6 @@ var render = function() {
                 }
               }),
               _vm._v(" "),
-              _c("label", [_vm._v("ssh")]),
-              _vm._v(" "),
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.form.ssh,
-                    expression: "form.ssh"
-                  }
-                ],
-                staticClass: "mb-2 form-control",
-                attrs: { type: "text", placeholder: "Введите ssh" },
-                domProps: { value: _vm.form.ssh },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
-                    }
-                    _vm.$set(_vm.form, "ssh", $event.target.value)
-                  }
-                }
-              }),
-              _vm._v(" "),
               _c("label", [_vm._v("Логин администратора")]),
               _vm._v(" "),
               _c("input", {
@@ -40990,8 +41039,24 @@ var render = function() {
             _c("div", { staticClass: "col col-lg-4" })
           ]),
           _vm._v(" "),
+          _vm.project.ssh === null
+            ? _c("div", { staticClass: "row justify-content-md-center mt-2" }, [
+                _vm._m(3),
+                _vm._v(" "),
+                _vm._m(4)
+              ])
+            : _c("div", { staticClass: "row justify-content-md-center mt-2" }, [
+                _vm._m(5),
+                _vm._v(" "),
+                _c("div", { staticClass: "col col-lg-8" }, [
+                  _c("a", { attrs: { href: _vm.project.ssh } }, [
+                    _vm._v("Скачать файл ssh")
+                  ])
+                ])
+              ]),
+          _vm._v(" "),
           _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
-            _vm._m(3),
+            _vm._m(6),
             _vm._v(" "),
             _c("div", { staticClass: "col col-lg-4" }, [
               _c("input", {
@@ -41022,7 +41087,7 @@ var render = function() {
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "row justify-content-md-center mt-1" }, [
-            _vm._m(4),
+            _vm._m(7),
             _vm._v(" "),
             _c("div", { staticClass: "col col-lg-4" }, [
               _c("input", {
@@ -41083,12 +41148,27 @@ var render = function() {
                 ]
               )
             ])
-          : _vm._e()
+          : _c("div", { staticClass: "col col-lg-2" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-danger",
+                  attrs: { type: "button" },
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      return _vm.deleteSsh.apply(null, arguments)
+                    }
+                  }
+                },
+                [_vm._v("Удалить ssh")]
+              )
+            ])
       ]),
       _vm._v(" "),
       _c("h1", [_vm._v("Пользователи проекта:")]),
       _vm._v(" "),
-      _vm._m(5),
+      _vm._m(8),
       _vm._v(" "),
       _vm._l(_vm.project.users, function(user) {
         return _c(
@@ -41151,7 +41231,7 @@ var render = function() {
       _vm._v(" "),
       _vm.loading
         ? _c("div", { staticClass: "d-flex justify-content-center" }, [
-            _vm._m(6)
+            _vm._m(9)
           ])
         : _vm._e()
     ],
@@ -41181,6 +41261,30 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "col col-lg-4" }, [
       _c("h4", [_vm._v("Ссылка на сайт: ")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col col-lg-4" }, [
+      _c("h4", [_vm._v("Файл ssh: ")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col col-lg-8" }, [
+      _c("h4", [_vm._v("Файл с ключом ssh отсутствует")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col col-lg-4" }, [
+      _c("h4", [_vm._v("Файл ssh: ")])
     ])
   },
   function() {
@@ -41513,7 +41617,10 @@ var render = function() {
       _vm.project.admin_password !== null
         ? _c(
             "div",
-            { staticClass: "row justify-content-md-center mt-1 mb-3" },
+            {
+              staticClass:
+                "row justify-content-md-center mt-1 border-bottom border-dark"
+            },
             [
               _vm._m(4),
               _vm._v(" "),
@@ -41524,9 +41631,29 @@ var render = function() {
           )
         : _vm._e(),
       _vm._v(" "),
+      _vm.project.ssh === null
+        ? _c(
+            "div",
+            { staticClass: "row justify-content-md-center mt-1 mb-3" },
+            [_vm._m(5), _vm._v(" "), _vm._m(6)]
+          )
+        : _c(
+            "div",
+            { staticClass: "row justify-content-md-center mt-1 mb-3" },
+            [
+              _vm._m(7),
+              _vm._v(" "),
+              _c("div", { staticClass: "col col-lg-8" }, [
+                _c("a", { attrs: { href: _vm.project.ssh } }, [
+                  _vm._v("Скачать файл ssh")
+                ])
+              ])
+            ]
+          ),
+      _vm._v(" "),
       _c("h1", [_vm._v("Пользователи проекта:")]),
       _vm._v(" "),
-      _vm._m(5),
+      _vm._m(8),
       _vm._v(" "),
       _vm._l(_vm.project.users, function(user) {
         return _c(
@@ -41589,7 +41716,7 @@ var render = function() {
       _vm._v(" "),
       _vm.loading
         ? _c("div", { staticClass: "d-flex justify-content-center" }, [
-            _vm._m(6)
+            _vm._m(9)
           ])
         : _vm._e()
     ],
@@ -41635,6 +41762,30 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "col col-lg-4" }, [
       _c("h4", [_vm._v("Пароль администратора: ")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col col-lg-4" }, [
+      _c("h4", [_vm._v("Файл ssh: ")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col col-lg-8" }, [
+      _c("h4", [_vm._v("Файл с ключом ssh отсутствует")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col col-lg-4" }, [
+      _c("h4", [_vm._v("Файл ssh: ")])
     ])
   },
   function() {

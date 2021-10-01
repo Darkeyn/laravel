@@ -14,10 +14,6 @@
 
                 <input type="text" class="mb-2 form-control" placeholder="Введите адрес сайта" v-model="form.adress">
 
-                <label >ssh</label>
-
-                <input type="text" class="mb-2 form-control" placeholder="Введите ssh" v-model="form.ssh">
-
                 <label >Логин администратора</label>
 
                 <input type="text" class="mb-2 form-control" placeholder="Введите логин администратора" v-model="form.admin_login">
@@ -44,7 +40,6 @@ export default {
             form:{
                 name: '',
                 adress: '',
-                ssh: '',
                 admin_login: '',
                 admin_password: '',
             },
@@ -57,7 +52,7 @@ export default {
             axios.post('/api/projects', {
                 name: this.form.name,
                 adress: this.form.adress,
-                ssh: this.form.ssh,
+                ssh: null,
                 admin_login: this.form.admin_login,
                 admin_password: this.form.admin_password
             }).then(res => {

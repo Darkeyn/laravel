@@ -38,7 +38,7 @@
             </div>
         </div>
 
-        <div class="row justify-content-md-center mt-1 mb-3" v-if="project.admin_password !== null">
+        <div class="row justify-content-md-center mt-1 border-bottom border-dark" v-if="project.admin_password !== null">
             <div class="col col-lg-4">
                 <h4>Пароль администратора: </h4>
             </div>
@@ -46,6 +46,24 @@
                     <h4>{{project.admin_password}}</h4>
             </div>
         </div>
+        
+        <div class="row justify-content-md-center mt-1 mb-3" v-if="project.ssh === null">
+            <div class="col col-lg-4">
+                <h4>Файл ssh: </h4>
+            </div>
+            <div class="col col-lg-8">
+                    <h4>Файл с ключом ssh отсутствует</h4>
+            </div>
+        </div>
+        <div class="row justify-content-md-center mt-1 mb-3" v-else>
+            <div class="col col-lg-4">
+                <h4>Файл ssh: </h4>
+            </div>
+            <div class="col col-lg-8">
+                    <a v-bind:href="project.ssh">Скачать файл ssh</a>
+            </div>
+        </div>
+        
 
         <h1>Пользователи проекта:</h1>
 
@@ -96,6 +114,8 @@ export default {
         return{
             project: [],
             loading: true,
+            login: '',
+            password: ''
         }
     },
     mounted(){
@@ -120,8 +140,6 @@ export default {
         axios.get('/api/projects/' + this.projectId)
         .then (response => {
             this.project = response.data.data
-            this.isLoginEmpty(this.project.admin_login)
-            this.isPassEmpty(this.project.admin_password)
         })
         }
     },
