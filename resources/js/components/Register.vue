@@ -9,19 +9,60 @@
         <form>
             <div class="mx-auto mb-3 form-group" style="width: 400px;">
 
-                <span class="w-full text-red-500" v-if="errors.name">{{errors.name[0]}}</span>
+                <div class="alert alert-danger" role="alert" v-if="error">
+                    Ошибка, форма заполнена неверно
+                </div>
 
                 <label >Имя</label>
 
-                <input type="text" class="mb-2 form-control" placeholder="Введите имя" v-model="form.name">
+                <input type="text" class="mb-2 form-control" placeholder="Введите имя" v-model="form.name" :class="{'is-invalid': $v.form.name.$error}">
+                
+                <!-- Ошибки ------------------------------------------- -->
+                <div class="text-danger" v-if="!$v.form.name.required && $v.form.name.$error">
+                    Поле обязательно для заполнения
+                </div>
+                <div class="text-danger" v-if="!$v.form.name.maxLength && $v.form.name.$error">
+                    Максимальная длина поля: {{$v.form.name.$params.maxLength.max}} 
+                </div>
+                <div class="text-danger" v-if="!$v.form.name.minLength && $v.form.name.$error">
+                    Минимальная длина поля: {{$v.form.name.$params.minLength.min}} 
+                </div>
+                <!-- Ошибки ------------------------------------------- -->
 
                 <label >Email</label>
 
-                <input type="email" class="mb-2 form-control" placeholder="Введите email" v-model="form.email">
+                <input type="email" class="mb-2 form-control" placeholder="Введите email" v-model="form.email" :class="{'is-invalid': $v.form.email.$error}">
+                
+                <!-- Ошибки ------------------------------------------- -->
+                <div class="text-danger" v-if="!$v.form.email.required && $v.form.email.$error">
+                    Поле обязательно для заполнения
+                </div>
+                <div class="text-danger" v-if="!$v.form.email.maxLength && $v.form.email.$error">
+                    Максимальная длина поля: {{$v.form.email.$params.maxLength.max}} 
+                </div>
+                <div class="text-danger" v-if="!$v.form.email.minLength && $v.form.email.$error">
+                    Минимальная длина поля: {{$v.form.email.$params.minLength.min}} 
+                </div>
+                <div class="text-danger" v-if="!$v.form.email.email && $v.form.email.$error">
+                    Поле для email 
+                </div>
+                <!-- Ошибки ------------------------------------------- -->
 
                 <label >Пароль</label>
 
-                <input type="password" class="mb-2 form-control" placeholder="Введите пароль" v-model="form.password" name="pssword">
+                <input type="password" class="mb-2 form-control" placeholder="Введите пароль" v-model="form.password" name="pssword" :class="{'is-invalid': $v.form.password.$error}">
+                
+                <!-- Ошибки ------------------------------------------- -->
+                <div class="text-danger" v-if="!$v.form.password.required && $v.form.password.$error">
+                    Поле обязательно для заполнения
+                </div>
+                <div class="text-danger" v-if="!$v.form.password.maxLength && $v.form.password.$error">
+                    Максимальная длина поля: {{$v.form.password.$params.maxLength.max}} 
+                </div>
+                <div class="text-danger" v-if="!$v.form.password.minLength && $v.form.password.$error">
+                    Минимальная длина поля: {{$v.form.password.$params.minLength.min}} 
+                </div>
+                <!-- Ошибки ------------------------------------------- -->
 
                 <label >Подтверждение пароля</label>
 
@@ -37,6 +78,7 @@
 </template>
 
 <script>
+import { required, minLength, maxLength, email} from 'vuelidate/lib/validators'
 export default {
     data(){
         return{
@@ -46,7 +88,7 @@ export default {
                 password: '',
                 password_confirmation: ''
             },
-            errors:[],
+            error: false,
             loading: true,
         }
     },
@@ -69,12 +111,37 @@ export default {
     },
     methods:{
         saveForm(){
+            this.error = false;
+            this.$v.$touch()
+            if (this.$v.form.$anyError) {
+                return;
+            }
             axios.post('/api/register', this.form).then(()=>{
                 console.log('saved');
                 this.$router.push('/login');
             }).catch((error) =>{
-                this.errors = error.data.errors;
+                this.error = true;
             })
+        }
+    },
+    validations: {
+        form: {
+            name:{
+                required,
+                maxLength: maxLength(250),
+                minLength: minLength(2)
+            },
+            email:{
+                required,
+                email,
+                maxLength: maxLength(250),
+                minLength: minLength(2)
+            },
+            password:{
+                required,
+                maxLength: maxLength(250),
+                minLength: minLength(2)
+            }
         }
     }
 }

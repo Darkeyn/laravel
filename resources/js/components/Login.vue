@@ -9,14 +9,47 @@
 
     <div class="container" style="margin-top: 10%;" v-else>
         <form>
+
             <div class="mx-auto mb-3 form-group" style="width: 400px;">
+
+                <div class="alert alert-danger" role="alert" v-if="error">
+                    Ошибка, форма заполнена неверно
+                </div>
+
                 <label >Email</label>
 
-                <input v-model="form.email" type="email" class="mb-2 form-control" placeholder="Введите email">
+                <input type="email" class="mb-2 form-control" placeholder="Введите email" v-model="form.email" :class="{'is-invalid': $v.form.email.$error}">
+                
+                <!-- Ошибки ------------------------------------------- -->
+                <div class="text-danger" v-if="!$v.form.email.required && $v.form.email.$error">
+                    Поле обязательно для заполнения
+                </div>
+                <div class="text-danger" v-if="!$v.form.email.maxLength && $v.form.email.$error">
+                    Максимальная длина поля: {{$v.form.email.$params.maxLength.max}} 
+                </div>
+                <div class="text-danger" v-if="!$v.form.email.minLength && $v.form.email.$error">
+                    Минимальная длина поля: {{$v.form.email.$params.minLength.min}} 
+                </div>
+                <div class="text-danger" v-if="!$v.form.email.email && $v.form.email.$error">
+                    Поле для email 
+                </div>
+                <!-- Ошибки ------------------------------------------- -->
 
                 <label >Пароль</label>
 
-                <input v-model="form.password" type="password" class="mb-2 form-control" placeholder="Введите пароль" name="password">
+                <input type="password" class="mb-2 form-control" placeholder="Введите пароль" v-model="form.password" name="pssword" :class="{'is-invalid': $v.form.password.$error}">
+                
+                <!-- Ошибки ------------------------------------------- -->
+                <div class="text-danger" v-if="!$v.form.password.required && $v.form.password.$error">
+                    Поле обязательно для заполнения
+                </div>
+                <div class="text-danger" v-if="!$v.form.password.maxLength && $v.form.password.$error">
+                    Максимальная длина поля: {{$v.form.password.$params.maxLength.max}} 
+                </div>
+                <div class="text-danger" v-if="!$v.form.password.minLength && $v.form.password.$error">
+                    Минимальная длина поля: {{$v.form.password.$params.minLength.min}} 
+                </div>
+                <!-- Ошибки ------------------------------------------- -->
 
                 <div style="text-align:center;">
                     <button @click.prevent="loginUser" type="submit" class="btn btn-primary mt-2">Авторизоваться</button>
@@ -28,6 +61,7 @@
 </template>
 
 <script>
+import { required, minLength, maxLength, email} from 'vuelidate/lib/validators'
 export default {
     data(){
         return{
@@ -35,7 +69,7 @@ export default {
                 email: '',
                 password: ''    
             },
-            errors:[],
+            error: false,
             loading : true,
         }
     },
@@ -58,6 +92,11 @@ export default {
     },
     methods:{
         loginUser(){
+            this.error = false;
+            this.$v.$touch()
+            if (this.$v.form.$anyError) {
+                return;
+            }
             axios.post('/api/login', this.form)
             .then( res => {
                 if(res.data.success){
@@ -66,9 +105,24 @@ export default {
                 }
                 // this.$router.push({name: 'home'});
             }).catch(err =>{
-                console.log("Error!");
+                this.error = true;
             })
         },
+    },
+    validations: {
+        form: {
+            email:{
+                required,
+                email,
+                maxLength: maxLength(250),
+                minLength: minLength(2)
+            },
+            password:{
+                required,
+                maxLength: maxLength(250),
+                minLength: minLength(2)
+            }
+        }
     }
 }
 </script>

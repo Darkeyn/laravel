@@ -20,6 +20,9 @@ import ProjectView from './components/ProjectView'
 import NewProject from './components/NewProject'
 import Dashboard from './components/Dashboard'
 import UserKab from './components/UserKab'
+import Vuelidate from 'vuelidate'
+
+Vue.use(Vuelidate)
 
 import axios from 'axios';
 

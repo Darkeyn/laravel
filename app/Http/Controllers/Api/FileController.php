@@ -15,9 +15,6 @@ class FileController extends Controller
     // }
 
     public function fileadd(Request $request){
-        // return response()->json([
-        //     'message'=>"ok"
-        // ]);
         
         try{
             if($request->hasFile('ssh')){
@@ -35,31 +32,23 @@ class FileController extends Controller
             ]);
         }
 
-        // $path = Storage::disk('public')->put('txt', $request->file('ssh.txt'));
-
     }
 
     public function filedel($ssh){
-        // return response()->json([
-        //     'message'=>"ok"
-        // ]);
         
         try{
-            //$file_link = DB::table('projects')->select('ssh')->where('id', '=', $project_id)->first();
-            //$rest = substr($file_link, 10);
-            //echo($file_link);
-            //Storage::disk('public')->delete('ssh', $ssh);
-            //Storage::delete($ssh);
+            
             unlink(storage_path('app\\public\\ssh\\'.$ssh));
 
-            return response()->json($ssh);
+            return response()->json([
+                'message' => "File deleted"
+            ]);
+
         }catch(\Exception $e){
             return response()->json([
                 'message' => $e->getMessage()
             ]);
         }
-
-        // $path = Storage::disk('public')->put('txt', $request->file('ssh.txt'));
 
     }
 }
