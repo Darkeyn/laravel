@@ -2189,9 +2189,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
+      error: false,
       access: [],
       projects: [],
       userinfo: [],
@@ -2268,6 +2273,7 @@ __webpack_require__.r(__webpack_exports__);
     AccessRed: function AccessRed(project_id, userinfo_id) {
       var _this5 = this;
 
+      this.error = false;
       axios.post('/api/access/' + project_id + '/' + userinfo_id, {
         token: this.$store.state.token
       }).then(function (response) {
@@ -2281,13 +2287,17 @@ __webpack_require__.r(__webpack_exports__);
             }
           });
         } else {
+          _this5.error = true;
           console.log('Нет прав');
         }
+      })["catch"](function (error) {
+        _this5.error = true;
       });
     },
     AccessUd: function AccessUd(project_id, userinfo_id) {
       var _this6 = this;
 
+      this.error = false;
       axios.post('/api/access/' + project_id + '/' + userinfo_id, {
         token: this.$store.state.token
       }).then(function (response) {
@@ -2296,8 +2306,11 @@ __webpack_require__.r(__webpack_exports__);
         if (_this6.access.permission === 2) {
           _this6.deleteProject(project_id);
         } else {
+          _this6.error = true;
           console.log('Нет прав');
         }
+      })["catch"](function (error) {
+        _this6.error = true;
       });
     }
   }
@@ -40743,6 +40756,14 @@ var render = function() {
           [_vm._v("Добавить проект")]
         )
       ]),
+      _vm._v(" "),
+      _vm.error
+        ? _c(
+            "div",
+            { staticClass: "alert alert-danger", attrs: { role: "alert" } },
+            [_vm._v("\n                Ошибка, нет прав\n            ")]
+          )
+        : _vm._e(),
       _vm._v(" "),
       _vm._m(0),
       _vm._v(" "),

@@ -5,6 +5,10 @@
             <button type="button" class="btn btn-info btn-lg btn-block mb-3" @click.prevent="goproject">Добавить проект</button>
         </div>
 
+                <div class="alert alert-danger" role="alert" v-if="error">
+                    Ошибка, нет прав
+                </div>
+
         <div class="row justify-content-md-center mb-2">
             <div class="col col-lg-2  text-center">
                 <h4>Id проекта</h4>
@@ -77,6 +81,7 @@
 export default {
     data() {
         return{
+            error: false,
             access: [],
             projects: [],
             userinfo: [],
@@ -139,6 +144,7 @@ export default {
             })
         },
         AccessRed(project_id, userinfo_id){
+            this.error = false;
             axios.post('/api/access/'+project_id+'/'+userinfo_id, {token : this.$store.state.token})
             .then (response => {
                 this.access = response.data.data
@@ -147,11 +153,16 @@ export default {
                     this.$router.push({name: 'ProjectView', params: {projectId: project_id}})
                 }
                 else{
+                    this.error = true;
                     console.log('Нет прав')
                 }
             })
+            .catch((error) =>{
+                this.error = true;
+            })
         },
         AccessUd(project_id, userinfo_id){
+            this.error = false;
             axios.post('/api/access/'+project_id+'/'+userinfo_id, {token : this.$store.state.token})
             .then (response => {
                 this.access = response.data.data
@@ -160,8 +171,12 @@ export default {
                     this.deleteProject(project_id)
                 }
                 else{
+                    this.error = true;
                     console.log('Нет прав')
                 }
+            })
+            .catch((error) =>{
+                this.error = true;
             })
         },
     }
